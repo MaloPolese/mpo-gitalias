@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Add or find and replace aliases in .gitconfig by https://github.com/MaloPolese/git-alias
+# (c) Malo Polese
+
+in_block=false
+in_file_name=".gitconfig"
+out_file_name=".gitconfig.temp"
+for USER in `ls /home`
+do
+    path="/home/$USER"
+    out_file="$path/$out_file_name"
+    input_file="$path/$in_file_name"
+    if [ -f "/home/$USER/.gitconfig" ]; then
+        while IFS= read -r line
+        do
+            # Set the start of the block
+            if [ "$line" = "[alias]" ]; then
+                in_block=true
+            fi
+
+            # Set the end of the block
+            if $in_block && [ "$(echo "$line" | grep -c "^\[.*\]$")" -eq 1 ] && [ "$line" != "[alias]" ]; then
+                in_block=false
+            fi
+            
+            # Delete old aliases
+            if ! $in_block; then
+                echo "$line" >> "$out_file"
+            fi
+        done < "$input_file"
+
+    # Fetch new aliases
+    curl https://raw.githubusercontent.com/MaloPolese/git-alias/main/.gitconfig >> "$out_file"
+
+    rm "$input_file"
+    mv "$out_file" "$input_file"
+    chown malo:malo "$input_file"
+    fi
+done

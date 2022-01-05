@@ -1,0 +1,8 @@
+Package: mpo-gitalias
+Version: 1
+Maintainer: Malo Polese <malo.polese@hotmail.fr>
+Homepage: https://malo-polese.fr
+Section: utils
+Priority: optional
+Architecture: all
+Description: Create gitalias
